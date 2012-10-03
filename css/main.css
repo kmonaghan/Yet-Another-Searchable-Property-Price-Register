@@ -1,0 +1,31 @@
+
+
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+#map_canvas {
+	width: 460px;
+	height:600px;
+}
+#map_canvas img { 
+  max-width: none;
+}
+
+#map_canvas label { 
+  width: auto; display:inline; 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
