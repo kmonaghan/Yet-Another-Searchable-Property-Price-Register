@@ -66,4 +66,12 @@ function processResults(items, addToTable)
 	});
 	
 	map.fitBounds (bounds);
+	zoomChangeBoundsListener = 
+		google.maps.event.addListenerOnce(map, 'bounds_changed', function(event) {
+			if (this.getZoom())
+			{
+				this.setZoom(16);
+			}
+		});
+	setTimeout(function(){google.maps.event.removeListener(zoomChangeBoundsListener)}, 2000);
 }
