@@ -1,0 +1,16 @@
+/* TEAM */
+	Lead: Karl Monaghan
+	Twitter: @karlmonaghan
+	From: Ireland
+
+	Support: Mike McHugh
+	Twitter: @jymian
+	From: Ireland
+
+/* THANKS */
+	The Property Price Register at http://propertypriceregister.ie/
+
+/* SITE */
+	Last update: 2012/10/03
+	Language: English
+	Doctype: HTML5
