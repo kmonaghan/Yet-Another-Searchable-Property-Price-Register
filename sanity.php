@@ -68,7 +68,6 @@ if ($counts['total'])
 		<![endif]-->
 	</head>
 	<body>
-	<?php echo $whereString; ?>
 		<center>
 			<script type="text/javascript"><!--
 				google_ad_client = "ca-pub-1189639444988756";
