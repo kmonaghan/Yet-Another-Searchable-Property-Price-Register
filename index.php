@@ -169,8 +169,6 @@ if (count($_GET))
         <link rel="stylesheet" href="css/datepicker.css">
         <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
         <link rel="stylesheet" href="css/main.css">
-        
-        <link rel="author" href="humans.txt" />
 
         <!--[if lt IE 9]>
             <script src="js/vendor/html5-3.6-respond-1.1.0.min.js"></script>
@@ -212,7 +210,7 @@ if (count($_GET))
 						if (isset($results) && $results)
 						{
 						?>
-						<caption>Showing results <?php echo $offset + 1; ?> to <?php echo $offset + $limit; ?> of <?php echo number_format($counts['total']);?></caption>
+						<caption>Showing results <?php echo $offset + 1; ?> to <?php echo $offset + count($results); ?> of <?php echo number_format($counts['total']);?></caption>
 						<?php
 						}
 						?>
@@ -235,10 +233,10 @@ if (count($_GET))
 								<td><?php echo $row['date_of_sale']; ?></td>
 								<td>
 									<a href="?id=<?php echo $row['id'];?>">
-									<?php echo $row['address'] . ', Co. ' . $row['county']; ?><br />
+									<?php echo $row['address'] . ', Co. ' . $row['county']; ?></a><br />
 									<?php echo $row['description_of_property']; ?><br />
 									<?php echo $row['property_size_description']; ?>
-									</a>
+									
 								</td>
 								<td>&euro;<?php echo number_format($row['price']); ?></td>
 								<td><?php echo ($row['not_full_market_price']) ? 'No' : 'Yes'; ?></td>
