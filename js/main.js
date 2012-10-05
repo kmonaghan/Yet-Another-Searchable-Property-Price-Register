@@ -42,7 +42,7 @@ $(document).ready(function() {
 function processResults(items, addToTable)
 {
 	var bounds = new google.maps.LatLngBounds ();
-	
+		
 	$.each(items, function(i, item) {
 		if (item.lat)
 		{
@@ -68,7 +68,7 @@ function processResults(items, addToTable)
 	map.fitBounds (bounds);
 	zoomChangeBoundsListener = 
 		google.maps.event.addListenerOnce(map, 'bounds_changed', function(event) {
-			if (this.getZoom())
+			if (this.getZoom() && items.length == 1)
 			{
 				this.setZoom(16);
 			}
