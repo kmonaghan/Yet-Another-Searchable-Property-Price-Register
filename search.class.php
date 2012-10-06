@@ -10,7 +10,7 @@ class Search
 	
 	private $_having;
 	
-	private $_order = 'date_of_sale';
+	private $_order = 'date_of_sale DESC';
 	
 	private $_limit = 10;
 	private $_offset = 0;
@@ -26,9 +26,19 @@ class Search
 		$this->_dbh = $dbh;
 	}
 	
+	public function getUnorderedURL()
+	{
+		$url = $this->_urlArray;
+		
+		array_pop($url);
+		array_pop($url);
+		
+		return '?' . implode('&', $url);
+	}
+	
 	public function getURL()
 	{
-		return implode('&', $this->_urlArray);
+		return '?' . implode('&', $this->_urlArray);
 	}
 	
 	public function getCount()
@@ -51,7 +61,9 @@ class Search
 		
 		$pagination['totalPagesToShow'] = ($pagination['totalPages'] < 10) ? $pagination['totalPages'] : 10; 
 		$pagination['startPage'] = ($pagination['totalPages'] < 10) ? 1 : (($pagination['currentPage'] < 5) ? 1 : $pagination['currentPage'] - 5);
-			
+					
+		$pagination['start'] = $this->_offset;
+		
 		return $pagination;
 	}
 	
@@ -59,8 +71,8 @@ class Search
 	{
 		$whereString = (count($this->_whereArray)) ? ' WHERE ' . implode (' AND ', $this->_whereArray) : '';
 		
-		$sql = "SELECT {$select} FROM property $whereString {$having} ORDER BY {$this->_order} DESC $limit";
-		
+		$sql = "SELECT {$select} FROM property $whereString {$having} ORDER BY {$this->_order} $limit";
+
 		return $sql;
 	}
 	
@@ -108,8 +120,8 @@ class Search
 	public function hydrate($details)
 	{
 		$this->_limit = (isset($details['limit']) && is_numeric($details['limit']) && $details['limit'] > 0) ? $details['limit'] : 10;
-		$this->_offset = (isset($details['page']) && is_numeric($details['page']) && $details['page'] > 0) ? $limit * ($details['page'] - 1) : 0;
-			
+		$this->_offset = (isset($details['page']) && is_numeric($details['page']) && ((int)$details['page'] > 0)) ? $this->_limit * ((int)$details['page'] - 1) : 0;
+
 		if (isset($details['lat']))
 		{
 			$this->_countSelect .= ', ( 6371 * acos( cos( radians(?) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(?) ) + sin( radians(?) ) * sin( radians( lat ) ) ) ) as distance ';
@@ -145,7 +157,7 @@ class Search
 			$this->_urlArray[] = 'to_price=' . trim($details['to_price']);
 		}
 		
-		if (isset($details['house_type']))
+		if (isset($details['house_type']) && ($details['house_type'] > 0))
 		{
 			$this->_whereArray[] = ' description_of_property = ' . (($details['house_type'] == 1) ? '"New Dwelling house /Apartment"' : '"Second-Hand Dwelling house /Apartment"') ;
 			
@@ -210,7 +222,32 @@ class Search
 			$this->_params[] = "$parts[2]-$parts[1]-$parts[0]";
 			$this->_whereArray[] = 'date_of_sale <= ?';
 			
-			$this->_urlArray[] = 'start_date=' . trim($details['start_date']);
+			$this->_urlArray[] = 'end_date=' . trim($details['end_date']);
+		}
+		
+		if (isset($details['order']))
+		{
+			$this->_order = ($details['order'] == 'price') ? 'price' : 'date_of_sale';
+			
+			$this->_urlArray[] = 'order=' . $this->_order;
+			
+			if (isset($details['desc']))
+			{
+				$this->_order .= ' DESC';
+				
+				$this->_urlArray[] = 'desc=1';
+			}
 		}	
+		else
+		{
+			$this->_urlArray[] = 'order=date_of_sale';
+			$this->_urlArray[] = 'desc=1';
+		}
+		
+		if (isset($details['id']))
+		{
+			$this->_params[] = $details['id'];
+			$this->_whereArray[] = 'id = ?';
+		}
 	}
 }
