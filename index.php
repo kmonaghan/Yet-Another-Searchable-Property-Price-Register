@@ -74,7 +74,7 @@ include 'header.php';
     		<div class="pagination pagination-centered">
     			<ul>
     				<li <?php if ($results['pagination']['currentPage'] == 1) echo 'class="disabled"'; ?>><a href="<?php echo $url . '&page=1'; ?>">First</a></li>
-    				<li <?php if ($results['pagination']['currentPage'] == 1) echo 'class="disabled"'; ?>><a href="<?php echo $url . '&page=' . ($currentPage - 1); ?>">Prev</a></li>
+    				<li <?php if ($results['pagination']['currentPage'] == 1) echo 'class="disabled"'; ?>><a href="<?php echo $url . '&page=' . ($results['pagination']['currentPage'] - 1); ?>">Prev</a></li>
 					<?php for ($i = 0; $i < $results['pagination']['totalPagesToShow']; $i++)
 					{
 					?>

@@ -14,7 +14,7 @@
 
         <script src="js/vendor/bootstrap.min.js"></script>
         <script src="js/vendor/bootstrap-datepicker.js"></script>
-        <script src="js/main.js?v=2"></script>
+        <script src="js/main.js?v=4"></script>
 
         <script>  
             var _gaq=[['_setAccount','UA-5653857-4'],['_trackPageview']];
