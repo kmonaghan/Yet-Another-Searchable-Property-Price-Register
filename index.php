@@ -1,205 +1,23 @@
 <?php
 include 'boot.php';
+include 'search.class.php';
+
+$results = array();
 
 if (count($_GET))
 {
-//print_r($_GET);
-	$limit = (isset($_GET['limit']) && is_numeric($_GET['limit']) && $_GET['limit'] > 0) ? $_GET['limit'] : 10;
-	$offset = (isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0) ? $limit * ($_GET['page'] - 1) : 0;
-
-	$params = array();
-
-	$whereArray = array();
+	$search = new Search();
 	
-	$urlArray = array();
+	$search->hydrate($_GET);
 	
-	if (isset($_GET['address']) && trim($_GET['address']))
-	{
-		$params[] = '%' . trim($_GET['address']) . '%';
-		$whereArray[] = ' address LIKE ?';
-		
-		$urlArray[] = 'address=' . trim($_GET['address']);
-	}
+	$results = $search->search();
 	
-	if (isset($_GET['from_price']) && (is_numeric($_GET['from_price'])))
-	{
-		$params[] = $_GET['from_price'];
-		$whereArray[] = ' price >= ?';
-		
-		$urlArray[] = 'from_price=' . trim($_GET['from_price']);
-	}
-	
-	if (isset($_GET['to_price']) && (is_numeric($_GET['to_price'])))
-	{
-		$params[] = $_GET['to_price'];
-		$whereArray[] = ' price < ?';
-		
-		$urlArray[] = 'to_price=' . trim($_GET['to_price']);
-	}
-	
-	if (isset($_GET['house_type']))
-	{
-		$whereArray[] = ' description_of_property = ' . (($_GET['house_type'] == 1) ? '"New Dwelling house /Apartment"' : '"Second-Hand Dwelling house /Apartment"') ;
-		
-		$urlArray[] = 'house_type=' . trim($_GET['house_type']);
-	}
-	
-	if (isset($_GET['postal_code']) && count($_GET['postal_code']))
-	{
-		$postalCode = ' postal_code IN (';
-		
-		foreach ($_GET['postal_code'] as $code)
-		{
-			$postalCode .= '?,';
-			$params[] = $code;
-			
-			$urlArray[] = 'postal_code[]=' . $code;
-		}
-		
-		$postalCode = rtrim($postalCode, ',');
-		$postalCode .= ')';
-		
-		$whereArray[] = $postalCode;
-	}
-	else if (isset($_GET['county']) && count($_GET['county']))
-	{
-		$county = ' county IN (';
-		
-		foreach ($_GET['county'] as $code)
-		{
-			$county .= '?,';
-			$params[] = $code;
-			$urlArray[] = 'county[]=' . $code;
-		}
-		
-		$county = rtrim($county, ',');
-		$county .= ')';	
-		
-		$whereArray[] = $county;
-	}
-	
-	if (isset($_GET['full_price']))
-	{
-		$whereArray[] = ' not_full_market_price = 0';
-		
-		$urlArray[] = 'full_price=1';
-	}
-	
-	if (isset($_GET['start_date']))
-	{
-		$parts = explode('-', $_GET['start_date']);
-		
-		$params[] = "$parts[2]-$parts[1]-$parts[0]";
-		$whereArray[] = 'date_of_sale >= ?';
-		
-		$urlArray[] = 'start_date=' . trim($_GET['start_date']);
-	}
-	
-	if (isset($_GET['end_date']))
-	{
-		$parts = explode('-', $_GET['end_date']);
-		
-		$params[] = "$parts[2]-$parts[1]-$parts[0]";
-		$whereArray[] = 'date_of_sale <= ?';
-		
-		$urlArray[] = 'start_date=' . trim($_GET['start_date']);
-	}
-	
-	if(isset($_GET['id']))
-	{
-		$whereArray = array();
-		$params = array();
-		$urlArray = array();
-		
-		$params[] = $_GET['id'];
-		$whereArray[] = 'id = ?';
-		
-		$urlArray[] = 'id=' . trim($_GET['id']);
-	}
-	
-	$url = 'index.php?' . implode('&', $urlArray);
-	$whereString = (count($whereArray)) ? ' WHERE ' . implode(' AND ', $whereArray) : '';
-	$countQuery = $dbh->prepare("SELECT count(*) as total FROM property $whereString ORDER BY date_of_sale");
-	$selectQuery = $dbh->prepare("SELECT * FROM property $whereString ORDER BY date_of_sale DESC LIMIT ? OFFSET ?");
-
-	$count = 1;
-	
-	foreach ($params as $param)
-	{
-		$countQuery->bindValue($count, $param);
-		$selectQuery->bindValue($count, $param);
-		
-		$count++;
-	}
-	
-	$selectQuery->bindValue($count, (int)$limit, PDO::PARAM_INT);
-	$selectQuery->bindValue($count + 1, (int)$offset, PDO::PARAM_INT);
-	
-	if ($countQuery->execute())
-	{
-		$counts = $countQuery->fetch(PDO::FETCH_ASSOC); 
-	};
-	if ($counts['total'])
-	{
-		$totalPages = ceil($counts['total'] / $limit);
-		$currentPage = (isset($_GET['page'])) ? (int)$_GET['page'] : 1;
-		
-		$totalPagesToShow = ($totalPages < 10) ? $totalPages : 10; 
-		$startPage = ($totalPages < 10) ? 1 : (($currentPage < 5) ? 1 : $currentPage - 5);
-		
-		if ($selectQuery->execute())
-		{
-			$results = $selectQuery->fetchAll();
-		};
-	}
+	$url = $search->getURL();
+	$unordered = $search->getUnorderedURL();
 }
+
+include 'header.php';
 ?>
-<!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
-    <head>
-        <meta charset="utf-8">
-        <title>Yet Another Searchable Property Price Register</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width">
-
-        <link rel="stylesheet" href="css/bootstrap.min.css">
-        <link rel="stylesheet" href="css/datepicker.css">
-        <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
-        <link rel="stylesheet" href="css/main.css">
-
-        <!--[if lt IE 9]>
-            <script src="js/vendor/html5-3.6-respond-1.1.0.min.js"></script>
-        <![endif]-->
-    </head>
-    <body>
-    	<center>
-			<script type="text/javascript"><!--
-				google_ad_client = "ca-pub-1189639444988756";
-				/* karlmonaghan.com leaderboard */
-				google_ad_slot = "3806467395";
-				google_ad_width = 728;
-				google_ad_height = 90;
-			//-->
-			</script>
-				<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-			</script>
-    	</center>
-        <!--[if lt IE 7]>
-            <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
-        <![endif]-->
-
-        <!-- This code is taken from http://twitter.github.com/bootstrap/examples/hero.html -->
-
-		<header id="overview" class="jumbotron subhead">
-			<div class="container">
-				<h1>Yet Another Searchable Property Price Register</h1>
-				<p class="lead">A mapped version of the Property Price Register.</p>
-			</div>
-		</header>
-        <div class="container-fluid">        	
 			<div class="row-fluid">
 				<div class="span6">
 					<div id="map_canvas"></div>
@@ -207,32 +25,32 @@ if (count($_GET))
 				<div class="span6">
 					<table id="results-table" class="table table-striped">
 						<?php
-						if (isset($results) && $results)
+						if (isset($results['total']))
 						{
 						?>
-						<caption>Showing results <?php echo $offset + 1; ?> to <?php echo $offset + count($results); ?> of <?php echo number_format($counts['total']);?></caption>
+						<caption>Showing results <?php echo number_format($results['pagination']['start'] + 1); ?> to <?php echo number_format($results['pagination']['start'] + count($results['results'])); ?> of <?php echo number_format($results['total']);?></caption>
 						<?php
 						}
 						?>
 						<thead>
 							<tr>
-								<th>Date Sold</th>
-								<th>Address</th>
-								<th>Price</th>
+								<th style="min-width: 94px;"><a href="<?php echo $unordered . '&order=date'; ?>"><i class="icon-arrow-up"></i></a>Date Sold<a href="<?php echo $unordered . '&order=date&desc=1'; ?>"><i class="icon-arrow-down"></i></a></th>
+								<th>Address</i></th>
+								<th style="min-width: 63px;"><a href="<?php echo $unordered . '&order=price'; ?>"><i class="icon-arrow-up"></i></a>Price<a href="<?php echo $unordered . '&order=price&desc=1'; ?>"><i class="icon-arrow-down"></i></a></th>
 								<th>Market Price?</th>
 							</tr>
 						</thead>
 						<tbody>
 						<?php
-						if (isset($results) && $results)
+						if (isset($results['total']))
 						{
-							foreach ($results as $row)
+							foreach ($results['results'] as $row)
 							{
 						?>
 							<tr>
 								<td><?php echo $row['date_of_sale']; ?></td>
 								<td>
-									<a href="?id=<?php echo $row['id'];?>">
+									<a href="house.php?id=<?php echo $row['id'];?>">
 									<?php echo $row['address'] . ', Co. ' . $row['county']; ?></a><br />
 									<?php echo $row['description_of_property']; ?><br />
 									<?php echo $row['property_size_description']; ?>
@@ -250,22 +68,22 @@ if (count($_GET))
     			</div>
     		</div>
 			<?php
-			if (isset($results) && $results && ($totalPages > 1))
+			if (isset($results['total']) && ($results['pagination']['totalPages'] > 1))
 			{
 			?>
     		<div class="pagination pagination-centered">
     			<ul>
-    				<li <?php if ($currentPage == 1) echo 'class="disabled"'; ?>><a href="<?php echo $url . '&page=1'; ?>">First</a></li>
-    				<li <?php if ($currentPage == 1) echo 'class="disabled"'; ?>><a href="<?php echo $url . '&page=' . ($currentPage - 1); ?>">Prev</a></li>
-					<?php for ($i = 0; $i < $totalPagesToShow; $i++)
+    				<li <?php if ($results['pagination']['currentPage'] == 1) echo 'class="disabled"'; ?>><a href="<?php echo $url . '&page=1'; ?>">First</a></li>
+    				<li <?php if ($results['pagination']['currentPage'] == 1) echo 'class="disabled"'; ?>><a href="<?php echo $url . '&page=' . ($currentPage - 1); ?>">Prev</a></li>
+					<?php for ($i = 0; $i < $results['pagination']['totalPagesToShow']; $i++)
 					{
 					?>
-					<li <?php if (($i + $startPage) == $currentPage) echo 'class="active"'; ?>><a href="<?php echo $url . '&page=' . ($i + $startPage); ?>"><?php echo $i + $startPage; ?></a></li>
+					<li <?php if (($i + $results['pagination']['startPage']) == $results['pagination']['currentPage']) echo 'class="active"'; ?>><a href="<?php echo $url . '&page=' . ($i + $results['pagination']['startPage']); ?>"><?php echo $i + $results['pagination']['startPage']; ?></a></li>
 					<?php
 					}
 					?>
-					<li <?php if ($currentPage == $totalPages) echo 'class="disabled"'; ?>><a href="<?php echo $url . '&page=' . ($currentPage + 1); ?>">Next</a></li>
-					<li <?php if ($currentPage == $totalPages) echo 'class="disabled"'; ?>><a href="<?php echo $url . '&page=' . ($totalPages); ?>">Last</a></li>
+					<li <?php if ($results['pagination']['currentPage'] == $results['pagination']['totalPages']) echo 'class="disabled"'; ?>><a href="<?php echo $url . '&page=' . ($results['pagination']['currentPage'] + 1); ?>">Next</a></li>
+					<li <?php if ($results['pagination']['currentPage'] == $results['pagination']['totalPages']) echo 'class="disabled"'; ?>><a href="<?php echo $url . '&page=' . ($results['pagination']['totalPages']); ?>">Last</a></li>
     			</ul>
     		</div>
 			<?php
@@ -397,38 +215,5 @@ if (count($_GET))
 	    			</div>
 	    		</form>
    			</div>
-            <hr>
-
-            <footer>
-                <p>By <a href="http://www.karlmonaghan.com/">Karl Monaghan</a> &amp; <a href="https://twitter.com/jymian">Mike McHugh</a>&nbsp;|&nbsp;Data provided by <a href="http://propertypriceregister.ie">Residential Property Price Register</a>&nbsp;|&nbsp;<a href="http://www.karlmonaghan.com/contact">Get in touch</a></p>
-            </footer>
-
-        </div> <!-- /container -->
-
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
-		
-        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.8.1.min.js"><\/script>')</script>
-
-		<script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
-
-        <script src="js/vendor/bootstrap.min.js"></script>
-        <script src="js/vendor/bootstrap-datepicker.js"></script>
-        <script src="js/main.js?v=2"></script>
-
-        <script>  
-            var _gaq=[['_setAccount','UA-5653857-4'],['_trackPageview']];
-            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
-            s.parentNode.insertBefore(g,s)}(document,'script'));
 <?php
-if (isset($results) && $results)
-{
-?>
-			results = <?php echo json_encode($results); ?>;
-<?php
-}
-?>
-
-        </script>
-    </body>
-</html>
+include 'footer.php';
