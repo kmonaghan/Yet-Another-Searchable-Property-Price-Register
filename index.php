@@ -250,7 +250,7 @@ if (count($_GET))
     			</div>
     		</div>
 			<?php
-			if (isset($results) && $results)
+			if (isset($results) && $results && ($totalPages > 1))
 			{
 			?>
     		<div class="pagination pagination-centered">
@@ -392,6 +392,7 @@ if (count($_GET))
 	    			<div class="control-group">
 	    				<div class="controls">
 							<button type="submit" class="btn btn-primary">Search</button>
+							<button type="reset" class="btn">Reset</button>
 	    				</div>
 	    			</div>
 	    		</form>
