@@ -42,7 +42,7 @@ $(document).ready(function() {
 function processResults(items, addToTable)
 {
 	var bounds = new google.maps.LatLngBounds ();
-		
+	
 	$.each(items, function(i, item) {
 		if (item.lat)
 		{
@@ -59,13 +59,15 @@ function processResults(items, addToTable)
 	
 			bounds.extend(marker.position);
 		}
+		
 		if (addToTable)
 		{
-			$('#results-table > tbody:last').append('<tr><td>' + item.date_of_sale + '</td><td>' + item.address + ', Co. ' + item.county + '<br />' + item.description_of_property + '<br />' + item.property_size_description + '</td><td>&euro;' + item.price + '</td><td>' + ((item.not_full_market_price) ? 'No' : 'Yes') + '</td></tr>');
+			$('#results-table > tbody:last').append('<tr><td>' + item.date_of_sale + '</td><td><a href="/property/house.php?id=' + item.id + '">' + item.address + ', Co. ' + item.county + '</a><br />' + item.description_of_property + '<br />' + item.property_size_description + '</td><td>&euro;' + item.price + '</td><td>' + ((item.not_full_market_price) ? 'No' : 'Yes') + '</td></tr>');
 		}
 	});
 	
 	map.fitBounds (bounds);
+	
 	zoomChangeBoundsListener = 
 		google.maps.event.addListenerOnce(map, 'bounds_changed', function(event) {
 			if (this.getZoom() && items.length == 1)
