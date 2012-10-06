@@ -56,14 +56,14 @@ class Search
 	public function getPagination($total)
 	{
 		$pagination['totalPages'] = ceil($total / $this->_limit);
-		$pagination['currentPage'] = floor($this->_offset / $this->_limit);
+		$pagination['currentPage'] = floor($this->_offset / $this->_limit) + 1;
 		if (!$pagination['currentPage']) $pagination['currentPage'] = 1;
 		
 		$pagination['totalPagesToShow'] = ($pagination['totalPages'] < 10) ? $pagination['totalPages'] : 10; 
 		$pagination['startPage'] = ($pagination['totalPages'] < 10) ? 1 : (($pagination['currentPage'] < 5) ? 1 : $pagination['currentPage'] - 5);
 					
 		$pagination['start'] = $this->_offset;
-		
+
 		return $pagination;
 	}
 	
