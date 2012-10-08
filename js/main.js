@@ -62,7 +62,7 @@ function processResults(items, addToTable)
 		
 		if (addToTable)
 		{
-			$('#results-table > tbody:last').append('<tr><td>' + item.date_of_sale + '</td><td><a href="/property/house.php?id=' + item.id + '">' + item.address + ', Co. ' + item.county + '</a><br />' + item.description_of_property + '<br />' + item.property_size_description + '</td><td>&euro;' + item.price + '</td><td>' + ((item.not_full_market_price) ? 'No' : 'Yes') + '</td></tr>');
+			$('#results-table > tbody:last').append('<tr><td>' + item.date_of_sale + '</td><td><a href="house.php?id=' + item.id + '">' + item.address + ', Co. ' + item.county + '</a><br />' + item.description_of_property + '<br />' + item.property_size_description + '</td><td>&euro;' + item.price + '</td><td>' + ((item.not_full_market_price) ? 'No' : 'Yes') + '</td></tr>');
 		}
 	});
 	
