@@ -129,10 +129,12 @@ function submitUpdate(){
 		cache: false,
 		data: data,
 		success: function(data){
-			console.log("Success: " + data);
+			/* TODO: display status to user */
+			//console.log("Success: " + data);
 		},
 		error: function(data){
-			console.log("Error: " + data);
+			/* TODO: display error to user */
+			//console.log("Error: " + data);
 		}
 	});
 }

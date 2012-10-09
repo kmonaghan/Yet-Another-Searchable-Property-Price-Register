@@ -5,7 +5,6 @@ include 'update.class.php';
 $update = new Update();
 $update->hydrate($_REQUEST);
 $results = $update->update();
-$results['break'] = "Something happens";
 
 $callback = $_REQUEST["callback"];
 
