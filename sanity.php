@@ -128,9 +128,9 @@ if ($counts['total'])
 							{
 						?>
 							<tr>
-								<td><a href="index.php?id=<?php echo $row['id'];?>"><?php echo $row['id']; ?></a></td>
+								<td><a href="house.php?id=<?php echo $row['id'];?>"><?php echo $row['id']; ?></a></td>
 								<td>
-									<a href="index.php?id=<?php echo $row['id'];?>">
+									<a href="house.php?id=<?php echo $row['id'];?>">
 									<?php echo $row['address'] . ', Co. ' . $row['county']; ?><br />
 									<?php echo $row['description_of_property']; ?><br />
 									<?php echo $row['property_size_description']; ?>

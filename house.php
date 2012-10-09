@@ -46,7 +46,17 @@ include 'header.php';
 									<?php echo $row['address'] . ', Co. ' . $row['county']; ?></a><br />
 									<?php echo $row['description_of_property']; ?><br />
 									<?php echo $row['property_size_description']; ?>
-									
+									<span class="update location" id="ref<?php echo $row['id'];?>">Update location</span>
+									<?php /* TODO: add a geo search box here */?>
+									<div class="update location hidden">
+										<p>Right-click on the map to select the correct location for this house.</p>
+										<form name="updateloc">
+											<input type="hidden" id="house_id" name="house_id" placeholder="house_id" value="<?php echo $row['id'];?>">
+											<input type="text" id="lat" name="lat" placeholder="lat" readonly><br/>
+											<input type="text" id="lng" name="lng" placeholder="lat" readonly>
+											<button type="submit" class="btn btn-primary">Update</button>
+										</form>
+									</div>
 								</td>
 								<td>&euro;<?php echo number_format($row['price']); ?></td>
 								<td><?php echo ($row['not_full_market_price']) ? 'No' : 'Yes'; ?></td>

@@ -1,9 +1,18 @@
 var map;
 var results = [];
+var marker = null;
 			
 $(document).ready(function() {
 	$('#start_date').datepicker();
 	$('#end_date').datepicker();
+	$('span.update').on('click',function(){
+		activateUpdating($(this));
+	});
+	
+	$('form[name="updateloc"]').submit(function(){
+		submitUpdate();
+		return(false);
+	})
 
 	var myOptions = {
 		center: new google.maps.LatLng( 53.45752026035937, -7.910118185714736 ),
@@ -42,7 +51,7 @@ $(document).ready(function() {
 function processResults(items, addToTable)
 {
 	var bounds = new google.maps.LatLngBounds ();
-	
+
 	$.each(items, function(i, item) {
 		if (item.lat)
 		{
@@ -52,7 +61,7 @@ function processResults(items, addToTable)
 			});
 			
 			google.maps.event.addListener(marker, 'click', function() {
-			var infowindow = new google.maps.InfoWindow();
+				var infowindow = new google.maps.InfoWindow();
 				infowindow.setContent(item.address + ' : ' + '&euro;' + item.price ); 
 				infowindow.open(map,marker);
 			});
@@ -76,4 +85,54 @@ function processResults(items, addToTable)
 			}
 		});
 	setTimeout(function(){google.maps.event.removeListener(zoomChangeBoundsListener)}, 2000);
+}
+
+//A function to create the marker and set up the event window function 
+function createMarker(latlng, name, html)
+{
+	var contentString = html;
+	var marker = new google.maps.Marker({
+		position: latlng,
+		map: map,
+		zIndex: Math.round(latlng.lat()*-100000)<<5
+	});
+
+	return marker;
+}
+
+function activateUpdating(source){
+	var classlist = source.attr("class").replace(" ",".");
+	
+	jQuery(source).addClass('hidden');
+	jQuery('div.' + classlist).removeClass('hidden');
+	
+	google.maps.event.addListener(map, 'rightclick', function(event) {
+		//call function to create marker
+		if (marker)
+		{
+			marker.setMap(null);
+			marker = null;
+		}
+		marker = createMarker(event.latLng, "name", "<b>Location</b><br>"+event.latLng);
+		jQuery('input#lat').val(event.latLng.lat());
+		jQuery('input#lng').val(event.latLng.lng());
+	});
+	
+}
+
+function submitUpdate(){
+	var data = jQuery('form[name="updateloc"]').serialize();
+	$.ajax({
+		url: 'update.php',
+		type: 'POST',
+		dataType: 'jsonp', 
+		cache: false,
+		data: data,
+		success: function(data){
+			console.log("Success: " + data);
+		},
+		error: function(data){
+			console.log("Error: " + data);
+		}
+	});
 }
