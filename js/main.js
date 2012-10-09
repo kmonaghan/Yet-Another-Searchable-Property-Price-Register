@@ -62,7 +62,7 @@ function processResults(items, addToTable)
 			
 			google.maps.event.addListener(marker, 'click', function() {
 				var infowindow = new google.maps.InfoWindow();
-				infowindow.setContent(item.address + ' : ' + '&euro;' + item.price ); 
+				infowindow.setContent('<a href="house.php?id='+ item.id +'">' + item.address + '</a>' + ' : ' + '&euro;' + item.price ); 
 				infowindow.open(map,marker);
 			});
 	
