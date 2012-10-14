@@ -1,7 +1,7 @@
             <hr>
 
             <footer>
-                <p>By <a href="http://www.karlmonaghan.com/">Karl Monaghan</a> &amp; <a href="https://twitter.com/jymian">Mike McHugh</a>&nbsp;|&nbsp;Data provided by <a href="http://propertypriceregister.ie">Residential Property Price Register</a>&nbsp;|&nbsp;<a href="http://www.karlmonaghan.com/contact">Get in touch</a></p>
+                <p>By <a href="http://www.karlmonaghan.com/">Karl Monaghan</a> &amp; <a href="https://twitter.com/jymian">Mike McHugh</a>&nbsp;|&nbsp;Data provided by <a href="http://propertypriceregister.ie">Residential Property Price Register</a>&nbsp;|&nbsp;<a href="http://www.karlmonaghan.com/contact">Get in touch</a>&nbsp;|&nbsp;<a href="http://www.karlmonaghan.com/2012/10/07/yet-another-searchable-property-price-register/">About</a>&nbsp;|&nbsp;<a href="https://github.com/kmonaghan/Yet-Another-Searchable-Property-Price-Register">Code</a></p>
             </footer>
 
         </div> <!-- /container -->
